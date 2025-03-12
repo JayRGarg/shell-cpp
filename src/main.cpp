@@ -12,7 +12,6 @@ int main() {
     std::cout << "$ ";
 
     while (std::getline(std::cin, input)) {
-        std::cout << input << std::endl;
         if (input.find("exit ") == 0) {
             exit_status = std::stoi(input.substr(5, std::string::npos));
             break;
