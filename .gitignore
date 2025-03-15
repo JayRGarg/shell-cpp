@@ -47,3 +47,6 @@ _deps
 
 build/
 vcpkg_installed
+
+#VSCODE
+.vscode
