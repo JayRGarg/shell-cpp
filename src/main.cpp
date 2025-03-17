@@ -23,7 +23,9 @@ int main() {
     std::vector<std::string> args;
     std::string cmd_path = "";
 
-    std::unordered_set<std::string> builtin = {"exit", "echo", "type", "pwd"};
+    std::filesystem::path WORKING_DIR = std::filesystem::current_path();
+
+    std::unordered_set<std::string> builtin = {"exit", "echo", "type", "pwd", "cd"};
 
     bool exit = false;
     int exit_status = 0;
@@ -61,8 +63,30 @@ int main() {
                     }
                 }
             } else if (args[0] == "pwd") {
-                std::cout << std::filesystem::current_path().string() << std::endl;
-            }
+                if (args.size() > 1) {
+                    std::cout << too_many_args(args) << std::endl;
+                } else {
+                    std::cout << WORKING_DIR.string() << std::endl;
+                }
+            } else if (args[0] == "cd") {
+                if (args.size() > 2) {
+                    std::cout << too_many_args(args) << std::endl;
+                } else {
+                    if (args[1][0] == '/') {
+                        if (args[1].size() > 1 and args[1].back() == '/') {
+                            args[1].pop_back();
+                        }
+                        std::filesystem::path dir_path(args[1]);
+                        if (std::filesystem::is_directory(dir_path)) {
+                            WORKING_DIR = dir_path;
+                        } else {
+                            std::cout << "cd: " << dir_path.string() << ": No such file or directory" << std::endl;
+                        }
+                    } else {
+                        std::cout << "cd: relative paths not implemented yet" << std::endl;
+                    }
+                }
+            } //else if (args[0] == "ls")
         } else {
             cmd_path = get_valid_path(args[0]);
             if (!cmd_path.empty()) {
