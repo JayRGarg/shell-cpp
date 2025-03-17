@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include <string>
 #include <vector>
+#include <filesystem>
 #include "get_valid_path.h"
 #include "split.h"
 #include "exec.h"
@@ -22,7 +23,7 @@ int main() {
     std::vector<std::string> args;
     std::string cmd_path = "";
 
-    std::unordered_set<std::string> builtin = {"exit", "echo", "type"};
+    std::unordered_set<std::string> builtin = {"exit", "echo", "type", "pwd"};
 
     bool exit = false;
     int exit_status = 0;
@@ -59,6 +60,8 @@ int main() {
                         }
                     }
                 }
+            } else if (args[0] == "pwd") {
+                std::cout << std::filesystem::current_path().string() << std::endl;
             }
         } else {
             cmd_path = get_valid_path(args[0]);
