@@ -4,6 +4,7 @@
 #include <vector>
 #include "get_valid_path.h"
 #include "split.h"
+#include "exec.h"
 
 std::string too_few_args(std::vector<std::string> arguments) {
     return arguments[0] + ": too few arguments";
@@ -19,6 +20,7 @@ int main() {
     std::cerr << std::unitbuf;
     std::string input, rest;
     std::vector<std::string> args;
+    std::string cmd_path = "";
 
     std::unordered_set<std::string> builtin = {"exit", "echo", "type"};
 
@@ -49,7 +51,6 @@ int main() {
                     if (builtin.contains(args[i])) {
                         std::cout << args[i] << " is a shell builtin" << std::endl;
                     } else {
-                        std::string cmd_path = "";
                         cmd_path = get_valid_path(args[i]);
                         if (!cmd_path.empty()) {
                             std::cout << args[i] << " is " << cmd_path << std::endl;
@@ -60,7 +61,13 @@ int main() {
                 }
             }
         } else {
-            std::cout << input << ": command not found" << std::endl;
+            cmd_path = get_valid_path(args[0]);
+            if (!cmd_path.empty()) {
+                std::string output = exec(input.c_str());
+                std::cout << output;
+            } else {
+                std::cout << input << ": command not found" << std::endl;
+            }
         }
         std::cout << "$ ";
     }
