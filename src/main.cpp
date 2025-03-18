@@ -3,9 +3,11 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <sstream>
 #include "get_valid_path.h"
 #include "split.h"
 #include "exec.h"
+#include "get_absolute_path.h"
 
 std::string too_few_args(std::vector<std::string> arguments) {
     return arguments[0] + ": too few arguments";
@@ -83,7 +85,12 @@ int main() {
                             std::cout << "cd: " << dir_path.string() << ": No such file or directory" << std::endl;
                         }
                     } else {
-                        std::cout << "cd: relative paths not implemented yet" << std::endl;
+                        std::filesystem::path abs_path = get_absolute_path(WORKING_DIR, args[1]);
+                        if (std::filesystem::is_directory(abs_path)) {
+                            WORKING_DIR = abs_path;
+                        } else {
+                            std::cout << "cd: " << abs_path.string() << ": No such file or directory" << std::endl;
+                        }
                     }
                 }
             } //else if (args[0] == "ls")
