@@ -17,6 +17,12 @@ std::string too_many_args(std::vector<std::string> arguments) {
     return arguments[0] + ": too many arguments";
 }
 
+void list_dir(const std::filesystem::path& path) {
+    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+        std::cout << entry.path().filename().string() << std::endl;
+    }
+}
+
 int main() {
     // Flush after every std::cout / std:cerr
     std::cout << std::unitbuf;
@@ -74,26 +80,27 @@ int main() {
                 if (args.size() > 2) {
                     std::cout << too_many_args(args) << std::endl;
                 } else {
-                    if (args[1][0] == '/') {
-                        if (args[1].size() > 1 and args[1].back() == '/') {
-                            args[1].pop_back();
-                        }
-                        std::filesystem::path dir_path(args[1]);
-                        if (std::filesystem::is_directory(dir_path)) {
-                            WORKING_DIR = dir_path;
-                        } else {
-                            std::cout << "cd: " << dir_path.string() << ": No such file or directory" << std::endl;
-                        }
+                    std::filesystem::path abs_path = get_absolute_path(WORKING_DIR, args[1]);
+                    if (std::filesystem::is_directory(abs_path)) {
+                        WORKING_DIR = abs_path;
                     } else {
-                        std::filesystem::path abs_path = get_absolute_path(WORKING_DIR, args[1]);
-                        if (std::filesystem::is_directory(abs_path)) {
-                            WORKING_DIR = abs_path;
-                        } else {
-                            std::cout << "cd: " << abs_path.string() << ": No such file or directory" << std::endl;
-                        }
+                        std::cout << "cd: " << abs_path.string() << ": No such file or directory" << std::endl;
                     }
                 }
-            } //else if (args[0] == "ls")
+            }
+        } else if (args[0] == "ls") {
+            if (args.size() == 1) {
+                list_dir(WORKING_DIR);
+            } else if (args.size() == 2) {
+                std::filesystem::path abs_path = get_absolute_path(WORKING_DIR, args[1]);
+                if (std::filesystem::is_directory(abs_path)) {
+                    list_dir(abs_path);
+                } else {
+                    std::cout << "ls: " << abs_path.string() << ": No such file or directory" << std::endl;
+                }
+            } else {
+                std::cout << too_many_args(args) << std::endl;
+            }
         } else {
             cmd_path = get_valid_path(args[0]);
             if (!cmd_path.empty()) {
