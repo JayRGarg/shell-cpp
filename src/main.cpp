@@ -42,6 +42,11 @@ int main() {
 
     while (std::getline(std::cin, input)) {
         args = split(input); //splits arguments into vector, by space
+		if (args.size() == 0) {
+			std::cout << "$ ";
+			continue;
+		}
+
         if (builtin.contains(args[0])) {
             if (args[0] == "exit") {
                 if (args.size() < 2) {
