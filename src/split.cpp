@@ -13,22 +13,30 @@ std::vector<std::string> split(std::string str) {
     /*}*/
     /*return res;*/
 	bool in_quote = false;
+	char q_char = '\0';
 	
 	for (char c: str) {
 		if (in_quote) {
-			if (c == '\'') {
+			if (c == q_char) {
 				in_quote = false;
-				result.push_back(token);
-				token.clear();
+				q_char = '\0';
+				/*result.push_back(token);*/
+				/*token.clear();*/
 			} else {
 				token += c;
 			}
 		} else {
 			if (c == '\'') {
 				in_quote = true;
+				q_char = '\'';
+			} else if (c == '"') {
+				in_quote = true;
+				q_char = '"';
 			} else if (c == ' ') {
-				result.push_back(token);
-				token.clear();
+				if (token.length() > 0) {
+					result.push_back(token);
+					token.clear();
+				}
 			} else {
 				token += c;
 			}
