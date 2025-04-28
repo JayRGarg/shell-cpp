@@ -14,16 +14,43 @@ std::vector<std::string> split(std::string str) {
     /*return res;*/
 	bool in_quote = false;
 	char q_char = '\0';
-	
+	bool esc_char = false;
+
 	for (char c: str) {
+		//std::cout << c << " " << std::endl;
 		if (in_quote) {
-			if (c == q_char) {
-				in_quote = false;
-				q_char = '\0';
-				/*result.push_back(token);*/
-				/*token.clear();*/
+			if (esc_char) {
+				if (c == 'n') {
+					token.pop_back();
+					token += '\n';
+				} else if (c == '$') {
+					token.pop_back();
+					token += '$';
+				} else if (c == '"') {
+					token.pop_back();
+					token += '\"';
+				} else if (c == '\\') {
+					token.pop_back();
+					token += '\\';
+				} else {
+					token += c;
+					if (c == '\'' && q_char == '\'') {
+						in_quote = false;
+						q_char = '\0';
+					}
+				}
+				esc_char = false;
 			} else {
-				token += c;
+				if (c == q_char) {
+					in_quote = false;
+					q_char = '\0';
+				} else {
+					if (c == '\\') {
+						//std::cout << "backslash encountered: " << std::endl;
+						esc_char = true;
+					}
+					token += c;
+				}
 			}
 		} else {
 			if (c == '\'') {
